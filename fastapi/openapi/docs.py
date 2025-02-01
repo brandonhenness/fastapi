@@ -98,6 +98,16 @@ def get_swagger_ui_html(
             """
         ),
     ] = None,
+    custom_css_url: Annotated[
+        Optional[str],
+        Doc(
+            """
+            The URL to use to load a custom CSS file for syle tweaks to the default CSS.
+
+            By default, 
+            """
+        ),
+    ] = "",
 ) -> HTMLResponse:
     """
     Generate and return the HTML  that loads Swagger UI for the interactive
@@ -118,7 +128,13 @@ def get_swagger_ui_html(
     <!DOCTYPE html>
     <html>
     <head>
-    <link type="text/css" rel="stylesheet" href="{swagger_css_url}">
+        <link type="text/css" rel="stylesheet" href="{swagger_css_url}">
+    """
+
+    if custom_css_url:
+        html += f"""<link type="text/css" rel="stylesheet" href="{custom_css_url}">"""
+
+    html += f"""
     <link rel="shortcut icon" href="{swagger_favicon_url}">
     <title>{title}</title>
     </head>
@@ -133,10 +149,10 @@ def get_swagger_ui_html(
     """
 
     for key, value in current_swagger_ui_parameters.items():
-        html += f"{json.dumps(key)}: {json.dumps(jsonable_encoder(value))},\n"
+        html += f"""{json.dumps(key)}: {json.dumps(jsonable_encoder(value))},\n"""
 
     if oauth2_redirect_url:
-        html += f"oauth2RedirectUrl: window.location.origin + '{oauth2_redirect_url}',"
+        html += f"""oauth2RedirectUrl: window.location.origin + '{oauth2_redirect_url}',"""
 
     html += """
     presets: [
